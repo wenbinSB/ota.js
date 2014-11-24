@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<p>asdadadad</p>
+	<div class="aa">
+		<a href="">xxxxx</a>
+	</div>
+	<div id="bb">hhhh</div>
+	<select name="" id="xx" multiple size="4">
+		<option class="aa" disabled>1</option>
+		<option class="aa">2</option>
+		<option class="aa">2</option>
+		<option class="aa">2</option>
+		<option class="aa">2</option>
+	</select>
+	<div class="cc">
+		<ul>
+			<li class="a">1</li>
+			<li>2</li>
+			<li>3</li>
+			<li>4</li>
+			<li>5</li>
+		</ul>
+	</div>
+</body>
+<script src="src/loader.js"></script>
+<script>
+	
+	var log = console.log.bind(console);
+	otaLoader({
+		path: './src/',
+		alias: {
+			'tab': './src/components/tab.js'
+		},
+		depend:{
+			'core': ['ajax','util','dom','storage'],
+			'dom': 'util',
+			'ota': 'timmer',
+			'ajax': ['util'],
+			'tab':'core'
+		}
+	})
+	// define('ota',['timmer'],function(timmer,exports){
+	// 	console.log(timmer);
+	// 	exports.name = 'xxx'
+	// })
+	// use('ota',function(ota){
+	// 	console.log(ota.name)
+	// })
+	use(['core','tab'],function(ota,tab){
+		console.log(ota);
+		ota.ajax({
+			url: 'http://127.0.0.1:7000',
+			type: 'post',
+			// headers: {
+			// 	'aa':'bbb'
+			// }, //need allow 
+			// crossdomain: true,
+			// data: {
+			// 	'req': 'utf-8'
+			// },
+			dataType: 'json',
+			// fresh: false,
+			success: function(data){
+				console.log(data);
+			},
+			error: function(err){
+				console.error(err)
+			}
+		})
+	})
+	use('core',function(ota){
+		ota.setCookie({
+			name:'ota',
+			value: 'xxoo',
+			expires: 1,
+			// domain: 'http://127.0.0.1',
+			// path: '/',
+			// secure: true
+		})
+		console.log(ota.getCookie('ota'))
+		ota.removeCookie('ota')
+		ota.setItem('xx','oo')
+		console.log(ota.getItem('xx'),ota.getItem('xx1'))
+		console.log(ota.hasItem('xx'))
+		console.log(ota.storageKeys())
+		ota.clearItem()
+	})
+	// use('util',function(util){
+		// util.Queue([function(next){
+		// 	console.log('1')
+		// 	next();
+		// },function(next){
+		// 	setTimeout(function(){
+		// 		console.log('2');
+		// 		next()
+		// 	},2000)
+		// }]).done(function(){
+		// 	console.log('done')
+		// })
+		// console.log(util.contains('aaaa','a'))
+		// console.log(util.contains([1,2,3],1))
+		// console.log(util.contains(document.body,document.getElementsByTagName('head')[0]))
+		// var a = {a:20}
+		// a = util.extend({a:30,b:40},a,true)
+		// console.log(a)
+		// util.each({a:20,b:40},function(el,key){
+		// 	console.log(el,key)
+		// })
+		// util.eval('   alert("xx")')
+		// log(util.isEmptyObject({}))
+		// log(util.isArrayLike(arguments))
+		// log(util.makeArray(arguments))
+		// console.log(util.parseHTML('<a>asdasd</a><table></table>'))
+	// })
+	// use(['dom'],function(dom){console.log(dom)})
+	// use('util',function(util){
+	// 	var Event = util.EventEmitter
+	// 	var pub = new Event
+	// 	pub.on('click',function(data){
+	// 		alert(data);
+	// 	})
+	// 	pub.emit('click','我靠')
+	// 	setTimeout(function(){
+	// 		pub.removeListener('click')
+	// 		console.log(pub.listeners('click'))
+	// 	})
+	// })
+</script>
+</html>
