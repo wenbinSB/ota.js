@@ -311,5 +311,10 @@ define('util',function(exports){
 	function shuffle(){
 
 	}
-	
+	/**
+	 * [cache 缓存系统]
+	 * @return {[type]} [description]
+	 */
+	exports._cache = {} 
+	exports.uuid = 1
 })

@@ -434,8 +434,11 @@ define('dom',['util'],function(util,exports){
 	E.clone = function(dom){
 		// 克隆事件
 	}
+	exports.E = E
+	exports.support = support
 	exports.get = function(ele,context){
 		// var a = new E();
 		return E(ele,context)
 	}
+
 })

@@ -26,6 +26,9 @@
 			<li>5</li>
 		</ul>
 	</div>
+	<form action="">
+		<input type="text" name="" id="xxv">
+	</form>
 </body>
 <script src="src/loader.js"></script>
 <script>
@@ -37,10 +40,12 @@
 			'tab': './src/components/tab.js'
 		},
 		depend:{
-			'core': ['ajax','util','dom','storage'],
-			'dom': 'util',
+			// 堆栈溢出
+			'core': ['ajax','util','dom','storage','event'],
+			'dom': ['util'],
 			'ota': 'timmer',
 			'ajax': ['util'],
+			'event': ['dom','util'],
 			'tab':'core'
 		}
 	})
@@ -48,77 +53,83 @@
 	// 	console.log(timmer);
 	// 	exports.name = 'xxx'
 	// })
-	// use('ota',function(ota){
+	// define('ota',['timmer'],function(timmer,exports){
+	// 	console.log(timmer);
+	// 	exports.name = 'xxx'
+	// })
+	// require('ota',function(ota){
 	// 	console.log(ota.name)
 	// })
-	use(['core','tab'],function(ota,tab){
-		console.log(ota);
-		ota.ajax({
-			url: 'http://127.0.0.1:7000',
-			type: 'post',
-			// headers: {
-			// 	'aa':'bbb'
-			// }, //need allow 
-			// crossdomain: true,
-			// data: {
-			// 	'req': 'utf-8'
-			// },
-			dataType: 'json',
-			// fresh: false,
-			success: function(data){
-				console.log(data);
-			},
-			error: function(err){
-				console.error(err)
-			}
-		})
-	})
-	use('core',function(ota){
-		ota.setCookie({
-			name:'ota',
-			value: 'xxoo',
-			expires: 1,
-			// domain: 'http://127.0.0.1',
-			// path: '/',
-			// secure: true
-		})
-		console.log(ota.getCookie('ota'))
-		ota.removeCookie('ota')
-		ota.setItem('xx','oo')
-		console.log(ota.getItem('xx'),ota.getItem('xx1'))
-		console.log(ota.hasItem('xx'))
-		console.log(ota.storageKeys())
-		ota.clearItem()
-	})
-	// use('util',function(util){
-		// util.Queue([function(next){
-		// 	console.log('1')
-		// 	next();
-		// },function(next){
-		// 	setTimeout(function(){
-		// 		console.log('2');
-		// 		next()
-		// 	},2000)
-		// }]).done(function(){
-		// 	console.log('done')
-		// })
-		// console.log(util.contains('aaaa','a'))
-		// console.log(util.contains([1,2,3],1))
-		// console.log(util.contains(document.body,document.getElementsByTagName('head')[0]))
-		// var a = {a:20}
-		// a = util.extend({a:30,b:40},a,true)
-		// console.log(a)
-		// util.each({a:20,b:40},function(el,key){
-		// 	console.log(el,key)
-		// })
-		// util.eval('   alert("xx")')
-		// log(util.isEmptyObject({}))
-		// log(util.isArrayLike(arguments))
-		// log(util.makeArray(arguments))
-		// console.log(util.parseHTML('<a>asdasd</a><table></table>'))
+	// require('ota',function(ota){
+	// 	console.log(ota.name)
 	// })
-	// use(['dom'],function(dom){console.log(dom)})
-	// use('util',function(util){
+	// require(['core','tab','event'],function(ota,tab,event){
+	// 	ota.ajax({
+	// 		url: 'http://127.0.0.1:7000',
+	// 		type: 'post',
+	// 		// headers: {
+	// 		// 	'aa':'bbb'
+	// 		// }, //need allow 
+	// 		// crossdomain: true,
+	// 		// data: {
+	// 		// 	'req': 'utf-8'
+	// 		// },
+	// 		dataType: 'json',
+	// 		// fresh: false,
+	// 		success: function(data){
+	// 			console.log(data);
+	// 		},
+	// 		error: function(err){
+	// 			console.error(err)
+	// 		}
+	// 	})
+	// })
+	// require('core',function(ota){
+	// 	ota.setCookie({
+	// 		name:'ota',
+	// 		value: 'xxoo',
+	// 		expires: 1,
+	// 		// domain: 'http://127.0.0.1',
+	// 		// path: '/',
+	// 		// secure: true
+	// 	})
+	// 	console.log(ota.getCookie('ota'))
+	// 	ota.removeCookie('ota')
+	// 	ota.setItem('xx','oo')
+	// 	console.log(ota.getItem('xx'),ota.getItem('xx1'))
+	// 	console.log(ota.hasItem('xx'))
+	// 	console.log(ota.storageKeys())
+	// 	ota.clearItem()
+	// })
+	// require('util',function(util){
+	// 	util.Queue([function(next){
+	// 		console.log('1')
+	// 		next();
+	// 	},function(next){
+	// 		setTimeout(function(){
+	// 			console.log('2');
+	// 			next()
+	// 		},2000)
+	// 	}]).done(function(){
+	// 		console.log('done')
+	// 	})
+	// 	console.log(util.contains('aaaa','a'))
+	// 	console.log(util.contains([1,2,3],1))
+	// 	console.log(util.contains(document.body,document.getElementsByTagName('head')[0]))
+	// 	var a = {a:20}
+	// 	a = util.extend({a:30,b:40},a,true)
+	// 	console.log(a)
+	// 	util.each({a:20,b:40},function(el,key){
+	// 		console.log(el,key)
+	// 	})
+	// 	util.eval('   alert("xx")')
+	// 	log(util.isEmptyObject({}))
+	// 	log(util.isArrayLike(arguments))
+	// 	log(util.makeArray(arguments))
+	// 	console.log(util.parseHTML('<a>asdasd</a><table></table>'))
+	// })
+	// require(['dom'],function(dom){console.log(dom)})
+	// require('util',function(util){
 	// 	var Event = util.EventEmitter
 	// 	var pub = new Event
 	// 	pub.on('click',function(data){
@@ -130,5 +141,42 @@
 	// 		console.log(pub.listeners('click'))
 	// 	})
 	// })
+	// require(['dom','event'],function(dom,event){
+	// 	console.log(dom.E)
+	// })
+	require('core',function(ota){
+		ota.get('body').on('click mouseover','a',function(e){
+			console.log(this.tagName,1)
+			return false;
+		})
+		// ota.get('body').off('click','a')
+		// ota.get('body').off()
+		ota.get('body').on('click','option',function(e){
+			console.log(this.tagName,2)
+		})
+		// ota.get('body').on('click',function(e){
+		// 	console.log(this.tagName,3)
+		// })
+		var fn = function(e){
+			console.log('div')
+		}
+		ota.get('div').on('click',fn)
+		ota.get('div').on('mousewheel',function(e){
+			// console.log(e.delta)
+		})
+		ota.get('body').on('keypress',function(e){
+			console.log('xxxx')
+		})
+		ota.get('div').off('click',fn)
+		// ota.get('body').off('click','a')
+		// ota.get('body').off('click')
+		// ota.get('body').off('mouseover')
+		ota.get('body').off()
+		// ota.get('body').off('keypress')
+		// ota.get('#xxv').on('blur',function(e){
+		// 	console.log('xxxx1')
+		// })
+
+	})
 </script>
 </html>
