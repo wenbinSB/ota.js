@@ -22,6 +22,9 @@ define('dom',['util'],function(util,exports){
 	})()
 	var E = function(selector,context){
 		var self = this,elem;
+		if (!selector) {
+			return this
+		}
 		if(!(self instanceof E)){
 			self = Object.create(E.prototype);
 		}
@@ -51,6 +54,13 @@ define('dom',['util'],function(util,exports){
 				context = context || document;
 				return util.extend(self,context.querySelectorAll(selector))
 			}
+		}else if(selector.nodeType){
+			self.length = 1;
+			self[0] = selector;
+		}else{
+			selector = util.makeArray(selector)
+			self.length = selector && selector.length
+			util.extend(self,selector)
 		}
 		return self;
 	}
@@ -144,16 +154,17 @@ define('dom',['util'],function(util,exports){
 			})
 		},
 		text: function(value){
-			var ret = []
-			this.each(function(){
-				if(typeof value === 'undefined'){
+			if(typeof value === 'undefined'){
+				var ret = []
+				this.each(function(){
 					ret.push(this.textContent || '')
-					
-				}else{
+				})
+				return (ret.length > 1) ? ret : ret[0];
+			}else{
+				return this.each(function(){
 					this.textContent = value;
-				}
-			})
-			return (ret.length > 1) ? ret : ret[0];
+				})
+			}
 		},
 		contains: function(el){
 			return util.contains(this[0],util.makeArray(el)[0])
@@ -330,6 +341,9 @@ define('dom',['util'],function(util,exports){
 			return this
 		},
 		is: function(){
+
+		},
+		serialize: function(){
 
 		}
 	}

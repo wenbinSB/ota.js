@@ -34,6 +34,17 @@ define('event',['dom','util'],function(dom,util,exports){
 		support = dom.support,
 		eventKey = 'otaEventId',
 		cache = util._cache
+	var getTarget = function(target,match){
+		var ret
+		while(target !== document){
+			if(target[support.matchesSelector](match)){
+				ret = target
+				break
+			}
+			target = target.parentNode
+		}
+		return ret
+	}
 	domProto.on = function(type,match,callback){
 		if(typeof callback === 'undefined'){
 			callback = match
@@ -59,12 +70,11 @@ define('event',['dom','util'],function(dom,util,exports){
 					}
 					handlers.handlerFn = function(e){
 						e = fixEvent(e)
-						var target = e.target,
-							self = this,result
+						var target = e.target,result,el
 						handlers['callback'].forEach(function(callback,index){
 							if(handlers['condition'][index]){
-								if(target[support.matchesSelector](handlers['condition'][index])){
-									result = callback.call(target,e)
+								if(el = getTarget(target,handlers['condition'][index])){
+									result = callback.call(el,e)
 								}else{
 									return
 								}
@@ -81,6 +91,7 @@ define('event',['dom','util'],function(dom,util,exports){
 				}
 			})
 		})
+		return this
 	}
 	// dom.off('click','#a',function(){})
 	// dom.off('click')
@@ -128,7 +139,7 @@ define('event',['dom','util'],function(dom,util,exports){
 				})
 			}
 		})
-		
+		return this
 	}
 
 	var eventMap = {
@@ -156,6 +167,21 @@ define('event',['dom','util'],function(dom,util,exports){
 				eventEmitter.initEvent(type,true,true)
 			this.dispatchEvent(eventEmitter)
 		})
+		return this
+	}
+
+	domProto.one = function(type,match,callback){
+		if(typeof callback === 'undefined'){
+			callback = match
+			match = undefined
+		}
+		var self = this
+		var _callback = function(e){
+			callback.call(this,e)
+			self.off(type,match,_callback)
+		}
+		this.on(type,match,_callback)
+		return this
 	}
 	// console.log(dom.E.prototype)
 	// exports.name = dom.get

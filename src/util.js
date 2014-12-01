@@ -13,10 +13,14 @@ define('util',function(exports){
 	var isObject = isType('Object');
 	var isFunction = isType('Function');
 	var isString = isType('String');
+	var isWindow = function(obj){
+		return obj != null && obj === obj.window;
+	}
 	exports.isArray = isArray;
 	exports.isObject = isObject;
 	exports.isFunction = isFunction;
 	exports.isString = isString;
+	exports.isWindow = isWindow
 	/**
 	 * [isArrayLike 类数组]
 	 * @param  {[type]}  arr [description]
@@ -24,6 +28,7 @@ define('util',function(exports){
 	 */
 	function isArrayLike(arr){
 		// isObject(arrayLike) === false
+		if(isWindow(arr)) {return false}
 		return arr && typeof arr === 'object' && 'length' in arr;
 	}
 	exports.isArrayLike = isArrayLike;
@@ -213,6 +218,10 @@ define('util',function(exports){
 	 * @return {[type]}           [description]
 	 */
 	function extend(target,source,overwrite){
+		if(isArrayLike(source)){
+			// ff needed
+			target['length'] = source['length']
+		}
 		for(var i in source){
 			if(source.hasOwnProperty(i)){
 				if(isObject(source[i]) && isObject(target[i]) && target.hasOwnProperty(i) && typeof target[i] !== 'undefined'){
@@ -265,10 +274,14 @@ define('util',function(exports){
 	 * @return {[type]}           [description]
 	 */
 	function makeArray(arr){
-		if(arr && !arr.length && arr.nodeType === 1){
-			return [arr]
-		}else if(isArrayLike(arr)){
-			return Array.prototype.slice.call(arr);
+		if(arr){
+			if(isArray(arr)){
+				return arr
+			}else if(isArrayLike(arr)){
+				return Array.prototype.slice.call(arr);
+			}else{
+				return [arr]
+			}
 		}
 	}
 	exports.makeArray = makeArray;
