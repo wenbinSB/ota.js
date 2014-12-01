@@ -1,16 +1,43 @@
 // 模块加载器
+
 (function(exports,undefined){
 	var modules = {}
 	var config = {
 		path: getCurPath(), //默认使用 loader 的目录
 		alias: {}
 	}
-	var loaded = []
 	var loader = function(conf){
 		for(var i in conf){
 			if(conf.hasOwnProperty(i)){
 				config[i] = conf[i]
 			}
+		}
+	}
+	function Queue(q){
+		if(!(this instanceof Queue)){
+			return new Queue(q)
+		}
+		this.waiting = [].concat(q)
+		this.todo = this.waiting.length
+	}
+	Queue.prototype = {
+		constructor : Queue,
+		run: function(){
+			var self = this
+			this.waiting.forEach(function(todo){
+				// next交由外部调用，将 this 传过去
+				todo(self.check.bind(self))
+			})
+		},
+		check: function(){
+			this.todo--
+			if(!this.todo){
+				this.callback()
+			}
+		},
+		done: function(callback){
+			this.callback = callback
+			this.run()
 		}
 	}
 	function loadJs(url,callback,extra){
@@ -40,7 +67,6 @@
 		 	name: mod,
 		 	requires: requires,
 		 	exports: {},
-		 	loaded: false,
 		 	callback: callback
 		 } 
 	}
@@ -51,6 +77,8 @@
 	}
 	function Module(requires,callback){
 		this.requires = [].concat(requires)
+		this.depends = getDepends(requires)
+		this.modCallback = {}
 		this.callback = callback
 		this.run()
 	}
@@ -58,14 +86,36 @@
 		run: function(){
 			var mods = modules,
 				self = this
-			new Depends(this.requires,function(dependList){
-				dependList.forEach(function(modName){
-					var module = mods[modName]
-					var requireMods = module.requires.map(function(mod){
-						return mods[mod].exports
+			var depends = [],
+				dependList = this.depends.slice(),depend
+			// 确保依赖按顺序执行
+			while(depend = dependList.pop()){
+				if(mods[depend]){
+					if(!self.modCallback[depend]){
+						self.modCallback[depend] = true
+					}
+					depends.push(function(next){
+						next()
 					})
-					module.callback.apply(null,requireMods.concat(module.exports))
-				})
+					continue
+				}
+				self.modCallback[depend] = true //自动过滤重复模块引用
+				depends.push(function(depend){
+					return function(next){
+						new Mod(depend,next)
+					}
+				}(depend))
+			}
+			Queue(depends).done(function(){
+				for(var modName in self.modCallback){
+					if(self.modCallback.hasOwnProperty(modName)){
+						var module = mods[modName]
+						var requireMods = module.requires.map(function(mod){
+							return mods[mod].exports
+						})
+						module.callback.apply(null,requireMods.concat(module.exports))	
+					}
+				}
 				var requireMods = self.requires.map(function(mod){
 					return mods[mod].exports
 				})
@@ -88,81 +138,30 @@
 			})
 		}
 	}
-	function Depends(requires,callback){
-		this.requires = requires
-		this.callback = callback
-		this.dependList = {}
-		this.waiting = 0
-		this.init()
-	}
-	Depends.prototype = {
-		init: function(){
-			var mods = modules,
-				self = this
-			this.getDepend(this.requires)
-		},
-		getDepend: function(requires){
-			var mods = modules,
-				self = this
-			this.waiting += requires.length
-			requires.forEach(function(require){
-				// console.log(require)
-				if(loaded[require]){
-					// console.log('xxxx')
-					self.waiting--
-					return self.checkDone()
-				}
-				// console.log(require)
-				loaded[require] = true
-				new Mod(require,function(){
-					self.waiting--
-					mods[require].loaded = true
-					// console.log(require)
-					if(mods[require]['requires'].length){
-						self.dependList[require] = mods[require]['requires']
-						// console.log(self.dependList)
-						return self.getDepend(mods[require]['requires'])
-					}
-					self.checkDone()
-				})
-			})
-		},
-		checkDone: function(){
-			if(!this.waiting){
-				// alert('done')
-				this.callback && this.callback(this.flatDepend(this.requires))
+	var getDepends = (function(){
+		// 循环引用的问题
+		var depends = {}
+		var findDepends = function(mod){
+			if(!depends[mod]){
+				return []
 			}
-		},
-		flatDepend: function(mods){
 			var ret = []
-			var depends = this.dependList
-			var findDepends = function(mod){
-				if(!depends[mod]){
-					return []
-				}
-				var ret = []
-				;[].concat(depends[mod]).forEach(function(depend){
-					ret.indexOf(depend) === -1 && ret.push(depend)
-					ret = ret.concat(findDepends(depend))
-				})
-				return ret
-			}
+			;[].concat(depends[mod]).forEach(function(depend){
+				ret.indexOf(depend) === -1 && ret.push(depend)
+				ret = ret.concat(findDepends(depend))
+			})
+			return ret
+		}
+		return function(mods){
+			var ret = []
+			depends = config.depend || {}
 			;[].concat(mods).forEach(function(depend){
 				ret = ret.concat(depend,findDepends(depend)) 
 			})
-			return this.uniqueDepend(ret)
-		},
-		uniqueDepend: function(dependList){
-			var depend,loaded = {},ret = []
-			while(depend = dependList.pop()){
-				if(!loaded[depend]){
-					loaded[depend] = true
-					ret.push(depend)
-				}
-			}
 			return ret
 		}
-	}
+
+	})()
 	function getAliasPath(modName){
 		return config.alias[modName] || config.path && config.path + modName + '.js'
 	}

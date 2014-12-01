@@ -330,4 +330,5 @@ define('util',function(exports){
 	 */
 	exports._cache = {} 
 	exports.uuid = 1
+	console.log('done')
 })

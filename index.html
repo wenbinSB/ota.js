@@ -44,16 +44,16 @@
 		alias: {
 			'tab': './src/components/tab.js'
 		},
-		depend:{
-			// 堆栈溢出
-			'core': ['ajax','util','dom','storage','event','style'],
-			'style': ['dom','timmer','util','event'],
-			'dom': ['util'],
-			'ota': 'timmer',
-			'ajax': ['util'],
-			'event': ['dom','util'],
-			'tab':'core'
-		}
+		// depend:{
+		// 	// 堆栈溢出
+		// 	'core': ['ajax','util','dom','storage','event','style'],
+		// 	'style': ['dom','timmer','util','event'],
+		// 	'dom': ['util'],
+		// 	'ota': 'timmer',
+		// 	'ajax': ['util'],
+		// 	'event': ['dom','util'],
+		// 	'tab':'core'
+		// }
 	})
 	// define('ota',['timmer'],function(timmer,exports){
 	// 	console.log(timmer);
@@ -150,50 +150,58 @@
 	// require(['dom','event'],function(dom,event){
 	// 	console.log(dom.E)
 	// })
-	require('core',function(ota){
-		// ota.ready(function(){
-		// 	console.log(this)
-		// })
-		ota.get('body').on('click mouseover','a',function(e){
-			console.log(this.tagName,1)
-			return false;
-		})
-		// ota.get('body').off('click','a')
-		// ota.get('body').off()
-		// ota.get('body').on('click','option',function(e){
-		// 	console.log(this.tagName,2)
-		// })
-		// ota.get('body').on('click',function(e){
-		// 	console.log(this.tagName,3)
-		// })
-		// var fn = function(e){
-		// 	console.log('div')
-		// }
-		// ota.get('div').on('click',fn)
-		// ota.get('div').on('mousewheel',function(e){
-		// 	// console.log(e.delta)
-		// })
-		// ota.get('body').on('keypress',function(e){
-		// 	console.log('xxxx')
-		// })
-		// ota.get('div').off('click',fn)
-		// ota.get('body').off('click','a')
-		// ota.get('body').off('click')
-		// ota.get('body').off('mouseover')
-		// ota.get('body').off()
-		// ota.get('body').one('click','p',function(){
-		// 	alert('xxxoo')
-		// 	console.log(this)
-		// })
-		// ota.get('body').off('keypress')
-		// ota.get('#xxv').on('blur',function(e){
-		// 	console.log('xxxx1')
-		// })
-		var $ = ota.get
-		// $('p').fadeIn(function(){
-		// 	console.log(this)
-		// })
+	// require(['ota'],function(xx){
+	// 	console.log(xx)
+	// 	// ota.ready(function(){
+	// 	// 	console.log(this)
+	// 	// })
+	// 	// ota.get('body').on('click mouseover','a',function(e){
+	// 	// 	console.log(this.tagName,1)
+	// 	// 	return false;
+	// 	// })
+	// 	// ota.get('body').off('click','a')
+	// 	// ota.get('body').off()
+	// 	// ota.get('body').on('click','option',function(e){
+	// 	// 	console.log(this.tagName,2)
+	// 	// })
+	// 	// ota.get('body').on('click',function(e){
+	// 	// 	console.log(this.tagName,3)
+	// 	// })
+	// 	// var fn = function(e){
+	// 	// 	console.log('div')
+	// 	// }
+	// 	// ota.get('div').on('click',fn)
+	// 	// ota.get('div').on('mousewheel',function(e){
+	// 	// 	// console.log(e.delta)
+	// 	// })
+	// 	// ota.get('body').on('keypress',function(e){
+	// 	// 	console.log('xxxx')
+	// 	// })
+	// 	// ota.get('div').off('click',fn)
+	// 	// ota.get('body').off('click','a')
+	// 	// ota.get('body').off('click')
+	// 	// ota.get('body').off('mouseover')
+	// 	// ota.get('body').off()
+	// 	// ota.get('body').one('click','p',function(){
+	// 	// 	alert('xxxoo')
+	// 	// 	console.log(this)
+	// 	// })
+	// 	// ota.get('body').off('keypress')
+	// 	// ota.get('#xxv').on('blur',function(e){
+	// 	// 	console.log('xxxx1')
+	// 	// })
+	// 	// var $ = ota.get
+	// 	// console.log(ota)
+	// 	// $('p').fadeIn(function(){
+	// 	// 	console.log(this)
+	// 	// })
 		
+	// })
+	require(['core','tab'],function(ota,tab){
+		console.log(ota)
 	})
+	// require('core',function(ota){
+	// 	console.log(ota)
+	// })
 </script>
 </html>
