@@ -4,35 +4,25 @@ define('ajax',['util'],function(util,exports){
 	// Promise.race 哪个先触发 reject 或者 resolve 触发then
 	// Promise.reject 将对象转变为 promise 对象
 	// Promise.resolve 将对象转变为 promise 对象
-	var defaultConfig = {
-		type: 'get',
-		contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-		headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        charset: 'utf-8',
-        fresh: true,
-        async: true,
-        crossdomain: false,
-        jsonp: 'callback'
-	}
 	var rnoContent = /^(?:get|head)$/;
 	var ajax = function(config){
-		var type = (config.type || defaultConfig.type).toLowerCase();
-		var needContentType = !rnoContent.test(type) || config.contentType;
-		config = util.extend(config,defaultConfig,true)
+		var type = config.type
+		var needContentType = config.contentType && !rnoContent.test(type); //文件上传无需 content-type,自动设置
 		var data = config.data;
 		var crossdomain = getUrlHost(config.url) !== location.host;
 		var dataType = config.dataType || '';
-
-		// handler data
+		var traditional = config.traditional
+		
 		if(data){
-			if(util.isObject(data)){
-				data = encodeData(data)
-			}
 			if(type === 'get'){
+				if(util.isObject(data)){
+					data = encodeData(data,traditional)
+				}
 				config.url = addQuery(config.url,data)
-				data = null;
+				data = null
+			}else{
+				// formData
+				data = makeFormData(data,traditional)
 			}
 		}
 
@@ -41,10 +31,10 @@ define('ajax',['util'],function(util,exports){
 			if(!jsonpCallback){
 				jsonpCallback = 'misakaCallback' + (config.fresh ? util.now() : '');
 			}
-			window[jsonpCallback] = window[jsonpCallback] || function(data){
-				config.success && config.success(data)
+			window[jsonpCallback] = window[jsonpCallback] || function(){
+				config.success && config.success.apply(null,[].slice.call(arguments))
 				setTimeout(function(){
-					window[jsonpCallback] = null;
+					delete window[jsonpCallback]
 				},100)
 			}
 			config.url = addQuery(config.url,config.jsonp + '=' + jsonpCallback)
@@ -54,7 +44,7 @@ define('ajax',['util'],function(util,exports){
 		}
 
 		var ajaxPromise = new Promise(function(resolve,reject){
-			var xhr = new XMLHttpRequest;
+			var xhr = new XMLHttpRequest,upload
 			xhr.open(type,config.url,config.async);
 			if(crossdomain){
 				if(config.crossdomain){
@@ -70,18 +60,34 @@ define('ajax',['util'],function(util,exports){
 					xhr.setRequestHeader(key,header)
 				})
 			}
+			if(config.timeout){
+				xhr.timeout = config.timeout
+			}
 			xhr.onload = function(){
 				resolve({
 					value: this.responseText,
 					dataType: dataType,
-					onloadCallback: config.success
+					onloadCallback: config.success,
+					xhr: this
 				})
 			}
-			xhr.onerror = function(e){
+			xhr.ontimeout = xhr.onerror = function(e){
 				reject({
 					value: e,
-					errorCallback: config.error
+					errorCallback: config.error,
+					xhr: this
 				})
+			}
+			if(config._upload){
+				// 是否文件上传
+				upload = xhr.upload
+				// upload.onload = xhr.onload.bind(upload)
+				// upload.onerror = xhr.onerror.bind(upload)
+				upload.onprogress = function(e){
+					if(e.lengthComputable){
+						config.progress && config.progress(e.loaded,e.total)
+					}
+				}
 			}
 			xhr.send(data)
 		})
@@ -90,9 +96,10 @@ define('ajax',['util'],function(util,exports){
 			if(data.dataType.toLowerCase() === 'json'){
 				data.value = JSON.parse(data.value)
 			}
-			return data.onloadCallback(data.value)
+			// 露出 xhr,用于 getResponseHeader
+			return data.onloadCallback(data.value,data.xhr)
 		},function(err){
-			return err.errorCallback(err.value)
+			return err.errorCallback(err.value,err.xhr)
 		}).catch(function(err){
 			// 异常处理？
 			throw new Error(err.message)
@@ -101,9 +108,39 @@ define('ajax',['util'],function(util,exports){
 		return ajaxPromise;
 		
 	}
-
-	var fileUpload = function(config){
-
+	var ajaxSetup = function(config){
+		var defaultConfig = {
+			type: 'get',
+			// contentType: 'application/x-www-form-urlencoded; charset=UTF-8', //使用 formData,无需设定
+			headers: {
+	            'X-Requested-With': 'XMLHttpRequest'
+	        },
+	        charset: 'utf-8',
+	        fresh: true,
+	        async: true,
+	        timeout: null,
+	        crossdomain: false,
+	        traditional: false,
+	        jsonp: 'callback'
+		}
+		config.type = config.type || defaultConfig.type.toLowerCase();
+		config = util.extend(config,defaultConfig,true)
+		return ajax(config)
+	}
+	var uploadSetup = function(config){
+		var defaultConfig = {
+			type: 'post',
+			headers: {
+	            'X-Requested-With': 'XMLHttpRequest'
+	        },
+	        async: true,
+	        timeout: null,
+	        chunked: false, //分块上传
+	        crossdomain: false,
+	        _upload: true
+		}
+		config = util.extend(config,defaultConfig,true)
+		return ajax(config)
 	}
 
 	var getScript = function(url,onload,onerror,extra){
@@ -138,12 +175,40 @@ define('ajax',['util'],function(util,exports){
 			return a.host
 		}
 	})()
-	function encodeData(data){
+	function encodeData(data,traditional){
 		var ret = [];
 		util.each(data,function(d,key){
-			ret.push(key + '=' + encodeURIComponent(d))
+			if(util.isArray(d) || util.isArrayLike(d)){
+				var _key = traditional ? key : key + '[]'
+				util.each(d,function(_d){
+					if(util.isString(_d)){
+						_d = encodeURIComponent(_d)
+					}
+					ret.push(_key + '=' + _d)
+				})
+			}else{
+				ret.push(key + '=' + encodeURIComponent(d))
+			}
 		})
 		return ret.join('&')
+	}
+	function makeFormData(data,traditional){
+		// formdata 无需编码属性名
+		var formData = new FormData
+		util.each(data,function(d,prop){
+			if(util.isArray(d) || util.isArrayLike(d)){
+				var _prop = traditional ? prop : prop + '[]'
+				util.each(d,function(_d){
+					if(util.isString(_d)){
+						_d = encodeURIComponent(_d)
+					}
+					formData.append(_prop,_d)
+				})
+			}else{
+				formData.append(prop,encodeURIComponent(d))
+			}
+		})
+		return formData
 	}
 	function addQuery(url,data){
 		if(url.indexOf('?') !== -1){
@@ -153,6 +218,7 @@ define('ajax',['util'],function(util,exports){
 		}
 		return url;
 	}
-	exports.ajax = ajax;
+	exports.ajax = ajaxSetup;
 	exports.getScript = getScript;
+	exports.fileUpload = uploadSetup
 })

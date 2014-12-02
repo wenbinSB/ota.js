@@ -201,8 +201,8 @@ define('util',function(exports){
 	 * @return {[type]}            [description]
 	 */
 	function each(obj,callback,context){
-		if(isArray(obj)){
-			return obj.forEach(callback,context)
+		if(isArray(obj) || isArrayLike(obj)){
+			return [].forEach.call(obj,callback,context)
 		}else if(isObject(obj)){
 			return Object.keys(obj).forEach(function(key){
 				callback.call(context || obj[key],obj[key],key)

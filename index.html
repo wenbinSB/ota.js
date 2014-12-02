@@ -55,6 +55,13 @@
 		// 	'tab':'core'
 		// }
 	})
+	require('core',function(ota){
+		var $ = ota.get
+		$('body').on('click','a',function(){
+			console.log(this.nodeName)
+			return false
+		})
+	})
 	// define('ota',['timmer'],function(timmer,exports){
 	// 	console.log(timmer);
 	// 	exports.name = 'xxx'
@@ -197,9 +204,6 @@
 	// 	// })
 		
 	// })
-	require(['core','tab'],function(ota,tab){
-		console.log(ota)
-	})
 	// require('core',function(ota){
 	// 	console.log(ota)
 	// })
