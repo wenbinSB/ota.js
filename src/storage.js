@@ -13,8 +13,8 @@ define('storage',function(exports){
 		},
 		removeCookie: function(name){
 			// expires=Thu, 01 Jan 1970 00:00:00 GMT
-			var value 
-			if(value = this.getCookie(name)){
+			var value = this.getCookie(name)
+			if(value){
 				return document.cookie = name + '=' + value + '; expires=' + 'Thu, 01 Jan 1970 00:00:00 GMT'
 			}
 		}
@@ -42,4 +42,5 @@ define('storage',function(exports){
 	}
 	extend(exports,cookie)
 	extend(exports,storage)
+	console.log('storage加载完毕')
 })

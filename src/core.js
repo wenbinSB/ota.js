@@ -1,4 +1,4 @@
-define('core',['dom','event','util','ajax','storage','style'],function(dom,event,util,ajax,storage,style,exports){
+define('core',['dom','event','util','ajax','storage','style','animate'],function(dom,event,util,ajax,storage,style,animate,exports){
 	var add = function(mods){
 		mods = [].concat(mods);
 		util.each(mods,function(mod){
@@ -14,4 +14,5 @@ define('core',['dom','event','util','ajax','storage','style'],function(dom,event
 	exports.author = 'otarim'
 	exports.ready = ready
 	window.$ = dom.get;
+	console.log('core加载完毕')
 })

@@ -31,6 +31,7 @@ define('event',['dom','util'],function(dom,util,exports){
 		return event
 	}
 	var domProto = dom.E.prototype,
+		$ = dom.get,
 		support = dom.support,
 		eventKey = 'otaEventId',
 		cache = util._cache
@@ -178,11 +179,12 @@ define('event',['dom','util'],function(dom,util,exports){
 		var self = this
 		var _callback = function(e){
 			callback.call(this,e)
-			self.off(type,match,_callback)
+			$(this).off(type,match,_callback)
 		}
 		this.on(type,match,_callback)
 		return this
 	}
 	// console.log(dom.E.prototype)
 	// exports.name = dom.get
+	console.log('event加载完毕')
 })

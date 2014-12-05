@@ -1,4 +1,4 @@
-define('style',['dom','timmer','util','event'],function(dom,timmer,util,event,exports){
+define('style',['dom','util','event'],function(dom,util,event,exports){
 	var domProto = dom.E.prototype,
 		$ = dom.get
 	var getComputedStyle = window.getComputedStyle,
@@ -6,12 +6,12 @@ define('style',['dom','timmer','util','event'],function(dom,timmer,util,event,ex
 			return prop.replace(/-([a-z])/gi,function(all,letter){return letter.toUpperCase()})
 		},
 		dasherize = function(str){
-		// 格式化属性名
-	    return str.replace(/::/g, '/')
-	           .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
-	           .replace(/([a-z\d])([A-Z])/g, '$1_$2')
-	           .replace(/_/g, '-')
-	           .toLowerCase()
+			// 格式化属性名
+		    return str.replace(/::/g, '/')
+		           .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+		           .replace(/([a-z\d])([A-Z])/g, '$1_$2')
+		           .replace(/_/g, '-')
+		           .toLowerCase()
 	    }
 	domProto.css = function(obj){
 		if(!obj){ return this}
@@ -72,67 +72,5 @@ define('style',['dom','timmer','util','event'],function(dom,timmer,util,event,ex
 			$this.css('display') === 'none' ? $this.show() : $this.hide()
 		})
 	}
-	var effect = {
-		fadeIn: {
-			name: 'fadeIn',
-			callback: function(){
-				this.css({'display': 'block'})
-			}
-		},
-		fadeOut: {
-			name: 'fadeOut',
-			callback: function(){
-				this.css({'display': 'none'})
-			}
-		},
-		slideDown: {
-			name: 'bounceInDown',
-			callback: function(){
-				this.css({'display': 'block'})
-			}
-		},
-		slideUp: {
-			name: 'bounceOutUp',
-			callback: function(){
-				this.css({'display': 'none'})
-			}
-		}
-	}
-	util.each(effect,function(fx,fnName){
-		domProto[fnName] = function(callback){
-			var className = ['animated'].concat(fx.name)
-			// this.css({'display': ''}) // reset display
-			setTimeout((function(){
-				this.each(function(){
-					this.animating = true
-				})
-				this.css({'display': ''})
-				this.addClass(className)		
-			}).bind(this),20)
-			this.one('animationend',function(){
-				delete this.animating
-				$(this).removeClass(className)
-				fx.callback && fx.callback.call($(this))
-				callback && callback.call(this)
-			})
-			return this
-		}
-	})
-	var toggleEffect = {
-		fadeToggle: ['fadeIn','fadeOut'],
-		slideToggle: ['slideDown','slideUp']
-	}
-	util.each(toggleEffect,function(effect,fnName){
-		domProto[fnName] = function(){
-			return this.each(function(){
-				if(this.animating){return}
-				var $this = $(this)
-				if($this.css('display') === 'none'){
-					$this[effect[0]]()
-				}else{
-					$this[effect[1]]()
-				}
-			})
-		}
-	})
+	console.log('style加载完毕')
 })

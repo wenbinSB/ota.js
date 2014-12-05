@@ -199,13 +199,26 @@ define('dom',['util'],function(util,exports){
 			})
 			return ret
 		},
-		data: function(){
-			return this.get(function(){
-				var classList = this.classList
-				if(classList.contains.apply(classList,classname) === false){
-					ret = false
+		data: function(prop,value){
+			var ret = []
+			if(typeof value === 'undefined' && util.isString(prop)){
+				this.each(function(){
+					ret.push(this.dataset[prop])
+				})
+				return (ret.length > 1) ? ret : ret[0];
+			}else{
+				if(util.isString(prop)){
+					return this.each(function(){
+						this.dataset[prop] = value
+					})
+				}else{
+					return this.each(function(){
+						util.each(prop,function(value,prop){
+							this.dataset[prop] = value
+						},this)
+					})
 				}
-			})
+			}
 		},
 		replaceWith: function(){
 			return this.get(arguments,function(elem){
@@ -230,7 +243,7 @@ define('dom',['util'],function(util,exports){
 					}
 					if(value === null){
 						// removeAttribute
-						
+						return this.removeAttribute(name)
 					}else{
 						return this.setAttribute(name,value + '');
 					}
@@ -454,5 +467,5 @@ define('dom',['util'],function(util,exports){
 		// var a = new E();
 		return E(ele,context)
 	}
-
+	console.log('dom加载完毕')
 })

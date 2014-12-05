@@ -135,7 +135,7 @@ define('ajax',['util'],function(util,exports){
 	        },
 	        async: true,
 	        timeout: null,
-	        chunked: false, //分块上传
+	        chunked: false, //分块上传 http://www.html5rocks.com/zh/tutorials/file/xhr2/
 	        crossdomain: false,
 	        _upload: true
 		}
@@ -221,4 +221,5 @@ define('ajax',['util'],function(util,exports){
 	exports.ajax = ajaxSetup;
 	exports.getScript = getScript;
 	exports.fileUpload = uploadSetup
+	console.log('ajax加载完毕')
 })

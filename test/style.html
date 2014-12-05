@@ -34,43 +34,32 @@
 	</style>
 </head>
 <body>
-	<p class="xx hide">otarim</p>
+	<p class="xx">otarim</p>
 	<a href="" class="show">show</a>
 </body>
 <script src="../src/loader.js"></script>
 <script>
-	otaLoader({
-		// path: '../src/',
-		alias: {
-			'tab': './src/components/tab.js'
-		},
-		depend:{
-			// 堆栈溢出
-			'core': ['ajax','util','dom','storage','event'],
-			'dom': ['util'],
-			'ajax': ['util'],
-			'event': ['dom','util'],
-			'tab':'core'
-		}
-	})
-	require('core',function(M){
-		var $ = M.get
-		var p = $('.xx')
-		$('body').on('click','.show',function(e){
-			if(p.hasClass('hide')){
-				// p.removeClass('hidden')
-				setTimeout(function(){
-					p.removeClass('hide')
-				},20)
-			}else{
-				p.addClass('hide')
-				// p.one('transitionend',function(){
-				// 	p.addClass('hidden')
-				// })
-			}
-			return false;
-		})
+	// require('core',function(M){
+	// 	var $ = M.get
+	// 	var p = $('.xx')
+		// $('body').on('click','.show',function(e){
+			// if(p.hasClass('hide')){
+			// 	// p.removeClass('hidden')
+			// 	setTimeout(function(){
+			// 		p.removeClass('hide')
+			// 	},20)
+			// }else{
+			// 	p.addClass('hide')
+			// 	// p.one('transitionend',function(){
+			// 	// 	p.addClass('hidden')
+			// 	// })
+			// }
+			// setTimeout(function(){
+			// 	document.querySelector('p').classList.add('hide')
+			// },0)
+			// return false;
+		// })
 
-	})
+	// })
 </script>
 </html>

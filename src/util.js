@@ -330,5 +330,8 @@ define('util',function(exports){
 	 */
 	exports._cache = {} 
 	exports.uuid = 1
-	console.log('done')
+	function inherits(){
+		
+	}
+	console.log('util加载完毕')
 })
