@@ -86,17 +86,8 @@ define('dom',['util'],function(util,exports){
 				this.parentNode && this.parentNode.insertBefore(elem,this.nextSibling)
 			})
 		},
-		remove: function(){
-			this.each(function(){
-				this.parentNode.removeChild(this)
-			})
-			return this
-		},
 		empty: function(){
 			return this.text('')
-		},
-		clone: function(){
-			// require event.js
 		},
 		each: function(callback){
 			var l = this.length
@@ -347,7 +338,7 @@ define('dom',['util'],function(util,exports){
 			}
 			if(l = this.length){
 				for(var i = 0;i < l; i++){
-					callback.call(this[i],args.cloneNode(true),i)
+					callback.call(this[i],args,i)
 				}
 			}
 			args = null
@@ -457,9 +448,6 @@ define('dom',['util'],function(util,exports){
 			d.appendChild(dom)
 		})
 		return d;
-	}
-	E.clone = function(dom){
-		// 克隆事件
 	}
 	exports.E = E
 	exports.support = support

@@ -59,6 +59,63 @@ define('style',['dom','util','event'],function(dom,util,event,exports){
 			height: Math.round(obj.height)
 		}
 	}
+	util.each({
+		scrollTop: {
+			method: 'pageYOffset',
+			fallback: function(value){
+				this.scrollTo(this.scrollX,value)
+			}
+		},
+		scrollLeft: {
+			method: 'pageXOffset',
+			fallback: function(value){
+				this.scrollTo(value,this.scrollY)
+			}
+		}
+	},function(type,fn){
+		domProto[fn] = function(value){
+			// window.scrollTo document.body.scrollTop
+			if(typeof value === 'undefined'){
+				// fix body.scrollTop
+				return (fn in this[0]) ? (this[0] === document.body ? (this[0][fn] + document.documentElement[fn]) : this[0][fn]) : this[0][type.method]
+			}else{
+				return this.each(function(){
+					if(fn in this){
+						if(this === document.body){
+							this[fn] = document.documentElement[fn] = value
+						}else{
+							this[fn] = value
+						}
+					}else{
+						type.fallback.call(this,value)
+					}
+				})
+			}
+		}
+	})
+	;['width','height'].forEach(function(fn){
+		// dealwith window,document
+		var UpperCaseValue = fn.replace(/./,function(m){return m.toUpperCase()})
+		domProto[fn] = function(value){
+			var ret = [],self = this
+			if(util.isUndefined(value)){
+				var el = this[0],ret
+				if(util.isWindow(el)){
+					ret = el['inner' + UpperCaseValue]
+				}else if(el === document){
+					ret = el.documentElement['scroll' + UpperCaseValue]
+				}else{
+					// return first el
+					ret = this.offset()[fn]
+				}
+				return ret
+			}else{
+				var setCss = {}
+				setCss[fn] = value
+				return this.css(setCss)
+			}
+		}
+	})
 	domProto.hide = function(){
 		return this.css({display: 'none'})
 	}

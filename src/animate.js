@@ -129,7 +129,8 @@ define('animate',['dom','util','event'],function(dom,util,event,exports){
 
 			$this.css(cssValue)			
 		// })
-		// return animatePromise			
+		// return animatePromise
+		return $this			
 	}
 
 	domProto.animate = function(props,config){

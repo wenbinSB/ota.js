@@ -16,11 +16,15 @@ define('util',function(exports){
 	var isWindow = function(obj){
 		return obj != null && obj === obj.window;
 	}
+	var isUndefined = function(obj){
+		return typeof obj === 'undefined'
+	}
 	exports.isArray = isArray;
 	exports.isObject = isObject;
 	exports.isFunction = isFunction;
 	exports.isString = isString;
 	exports.isWindow = isWindow
+	exports.isUndefined = isUndefined
 	/**
 	 * [isArrayLike 类数组]
 	 * @param  {[type]}  arr [description]
@@ -330,6 +334,7 @@ define('util',function(exports){
 	 */
 	exports._cache = {} 
 	exports.uuid = 1
+	
 	function inherits(){
 		
 	}

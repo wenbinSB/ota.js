@@ -31,6 +31,7 @@ define('event',['dom','util'],function(dom,util,exports){
 		return event
 	}
 	var domProto = dom.E.prototype,
+		E = dom.E,
 		$ = dom.get,
 		support = dom.support,
 		eventKey = 'otaEventId',
@@ -182,6 +183,32 @@ define('event',['dom','util'],function(dom,util,exports){
 			$(this).off(type,match,_callback)
 		}
 		this.on(type,match,_callback)
+		return this
+	}
+	domProto.clone = function(deep){
+		var ret = []
+		this.each(function(){
+			var node = this.cloneNode(deep),
+				Enode = E(node)			
+			// clone event
+			var eventId = this[eventKey]
+			if(eventId){
+				util.each(cache[eventId],function(value,type){
+					util.each(value['callback'],function(callback,index){
+						Enode.on(type,value['condition'][index],callback)
+					})
+				})
+			}
+			ret.push(node)
+		})
+		return E(ret)
+	}
+	domProto.remove = function(){
+		// delete all eventHander
+		this.off()
+		this.each(function(){
+			this.parentNode.removeChild(this)
+		})
 		return this
 	}
 	// console.log(dom.E.prototype)
