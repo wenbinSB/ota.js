@@ -13,6 +13,5 @@ define('core',['dom','event','util','ajax','storage','style','animate'],function
 	exports.version = '1.0'
 	exports.author = 'otarim'
 	exports.ready = ready
-	window.$ = dom.get;
 	console.log('core加载完毕')
 })

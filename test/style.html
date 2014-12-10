@@ -29,8 +29,8 @@
 	}*/
 	
 	.xx {opacity: 1;transition: all linear 1s;background: red;width: 100px;height: 100px;text-align: center;}
-	.hidden {display: none}
-	.hide {opacity: 0}
+	.hidden {display: none;}
+	.hide {opacity: 0;}
 	</style>
 </head>
 <body>
@@ -39,27 +39,24 @@
 </body>
 <script src="../src/loader.js"></script>
 <script>
-	// require('core',function(M){
-	// 	var $ = M.get
-	// 	var p = $('.xx')
-		// $('body').on('click','.show',function(e){
-			// if(p.hasClass('hide')){
-			// 	// p.removeClass('hidden')
-			// 	setTimeout(function(){
-			// 		p.removeClass('hide')
-			// 	},20)
-			// }else{
-			// 	p.addClass('hide')
-			// 	// p.one('transitionend',function(){
-			// 	// 	p.addClass('hidden')
-			// 	// })
-			// }
-			// setTimeout(function(){
-			// 	document.querySelector('p').classList.add('hide')
-			// },0)
-			// return false;
-		// })
+	require('core',function(M){
+		var $ = M.get
+		var p = $('.xx')
+		$('body').on('click touchstart','.show',function(e){
+			if(p.hasClass('hide')){
+				p.removeClass('hidden')
+				setTimeout(function(){
+					p.removeClass('hide')
+				},20)
+			}else{
+				p.addClass('hide')
+				p.one('transitionend',function(){
+					p.addClass('hidden')
+				})
+			}
+			return false;
+		})
 
-	// })
+	})
 </script>
 </html>

@@ -2,6 +2,11 @@ define('event',['dom','util'],function(dom,util,exports){
 	// 包装 event,修复 which,wheeldetal
 	// focus 捕获操作
 	// on,off,trigger
+	var eventMethods = {
+		preventDefault: 'isDefaultPrevented',
+		stopImmediatePropagation: 'isImmediatePropagationStopped',
+		stopPropagation: 'isPropagationStopped'
+	}
 	var fixEvent = function(event){
 		event.timeStamp = event.timeStamp || util.now()
 		if(!event.target){
@@ -28,6 +33,14 @@ define('event',['dom','util'],function(dom,util,exports){
 				event.delta = event.wheelDetal / 120
 			}
 		}
+		util.each(eventMethods,function(fn,name){
+			var originFn = event[name]
+			event[name] = function(){
+				event[fn] = function(){return true}
+				originFn && originFn.call(event)
+			}
+			event[fn] = function(){return false}
+		})
 		return event
 	}
 	var domProto = dom.E.prototype,
@@ -72,22 +85,26 @@ define('event',['dom','util'],function(dom,util,exports){
 					}
 					handlers.handlerFn = function(e){
 						e = fixEvent(e)
-						var target = e.target,result,el
+						if(e.isImmediatePropagationStopped()){return}
+						var target = e.target,
+							originEvent = e,result,el
+						e = e._args ? [e].concat(e._args) : [e] //handler customEvent's args
 						handlers['callback'].forEach(function(callback,index){
 							if(handlers['condition'][index]){
 								if(el = getTarget(target,handlers['condition'][index])){
-									result = callback.call(el,e)
+									result = callback.apply(el,e)
 								}else{
 									return
 								}
 							}else{
-								result = callback.call(self,e)
+								result = callback.apply(self,e)
 							}
 							if(result === false){
-								e.preventDefault()
-								e.stopPropagation()
+								originEvent.preventDefault()
+								originEvent.stopPropagation()
 							}
 						})
+						return result
 					}
 					self.addEventListener(type,handlers.handlerFn,useCapture)
 				}
@@ -160,13 +177,16 @@ define('event',['dom','util'],function(dom,util,exports){
 	}
 	var useDefaultEmitter = /^(focus|blur|select|submit|reset)$/
 	domProto.trigger = function(type){
+		var args = [].slice.call(arguments,1)
+		var eventEmitter = document.createEvent(getEventMap(type))
+			eventEmitter.initEvent(type,true,true)
+			useDefault = useDefaultEmitter.test(type)
+		args.length && (eventEmitter._args = args)
 		this.each(function(){
-			if(useDefaultEmitter.test(type)){
+			if(useDefault){
 				// 先触发默认操作,再调用 dispatchEvent
 				this[type] && this[type]()
 			}
-			var eventEmitter = document.createEvent(getEventMap(type))
-				eventEmitter.initEvent(type,true,true)
 			this.dispatchEvent(eventEmitter)
 		})
 		return this

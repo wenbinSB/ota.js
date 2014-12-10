@@ -133,14 +133,21 @@ define('animate',['dom','util','event'],function(dom,util,event,exports){
 		return $this			
 	}
 
-	domProto.animate = function(props,config){
+	domProto.animate = function(props,config,callback){
 		// use transition only
-		config = config || {}
+		if(util.isUndefined(callback)){
+			callback = config
+			config = {
+				ease: 'linear',
+				delay: 0,
+				duration: 400 / 1e3
+			}
+		}else{
+			config = config || {}
+		}
 		var duration = (parseInt(config.duration,10) || durationMap[config.duration] || 400) / 1e3
-			callback = config.callback
 			ease = config.easing || 'linear'
 			delay = (config.delay || 0) / 1e3
-
 		return animate.call(this,props,duration,callback,ease,delay)
 		// return this 
 	}

@@ -149,11 +149,6 @@ define('util',function(exports){
 			}
 
 		},
-		// once: function(event,listener){
-		// 	this.on(event,function(){
-
-		// 	})
-		// },
 		listeners: function(event){
 			var hub = this.hub
 			return hub[event] && hub[event].length || 0 
