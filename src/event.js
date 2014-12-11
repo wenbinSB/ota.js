@@ -191,7 +191,6 @@ define('event',['dom','util'],function(dom,util,exports){
 		})
 		return this
 	}
-
 	domProto.one = function(type,match,callback){
 		if(typeof callback === 'undefined'){
 			callback = match
@@ -204,6 +203,18 @@ define('event',['dom','util'],function(dom,util,exports){
 		}
 		this.on(type,match,_callback)
 		return this
+	}
+	domProto.toggleCallback = function(type){
+		var args = [].slice.call(arguments,1)
+		this.each(function(){
+			var toggleList = args.slice()
+			$(this).on(type,function(e){
+				var callback = toggleList.shift()
+				toggleList = toggleList.concat(callback)
+				callback.call(this,e)
+			})
+		})
+		return false
 	}
 	domProto.clone = function(deep){
 		var ret = []

@@ -37,8 +37,8 @@ define('touch','core',function(core,exports){
 		touch.lastTime = now
 		// 确保 tap 只触发一次 
 		clearTimeout(tapTime)
-
 	}).on('touchmove',function(e){
+		// 其他元素阻止了 touchstart 的冒泡，那么此时 touch.target 为空，需做判断
 		clearTimeout(longTime)
 		clearTimeout(tapTime)
 		var finger = e.touches[0]
@@ -48,23 +48,24 @@ define('touch','core',function(core,exports){
 		touch.detalY = Math.abs(touch.y2 - touch.y1)
 		touch.direction = swipeDirection(touch)
 		// 滑动中,根据方向返回非绝对值 offset
-		touch.target.trigger('swiping',{
+		touch.target && touch.target.trigger('swiping',{
 			direction : touch.direction,
 			offset: touch.detalX > touch.detalY ? (touch.x2 - touch.x1) : (touch.y2 - touch.y1)
 		})
 		touch.swipingTrigger = true
-		return false
 	}).on('touchend',function(e){
 		clearTimeout(longTime)
 		if(!touch.longTimeTrigger){
 			// 单点不拖动没有 detal
 			if(touch.detalX && touch.detalX > 20 || touch.detalY && touch.detalY > 20){
-				touch.target.trigger('swipe',Math.max(touch.detalX,touch.detalY))
-				touch.target.trigger('swipe' + touch.direction, Math.max(touch.detalX,touch.detalY))
+				if(touch.target){
+					touch.target.trigger('swipe',Math.max(touch.detalX,touch.detalY))
+					touch.target.trigger('swipe' + touch.direction, Math.max(touch.detalX,touch.detalY))	
+				}
 			}else if(!touch.swipingTrigger){
 				// 不为 swipe,单点 tap,单点延时
 				tapTime = setTimeout(function(){
-					touch.target.trigger('tap')
+					touch.target && touch.target.trigger('tap')
 				},250)
 				// doubleTap
 				if(touch.isDoubleTap){
@@ -89,5 +90,6 @@ define('touch','core',function(core,exports){
     		this.on(fn,callack)
     		return this
     	} 
-    }) 
+    })
+    console.log('touch加载完毕') 
 })
