@@ -50,6 +50,6 @@ define('touch','core',function(core,exports){
 	;['swipe', 'swipeLeft', 'swipeRight', 'swipeUp', 'swipeDown','doubleTap', 'tap', 'singleTap', 'longTap'].forEach(function(fn){
     	domProto[fn] = function(callack){
     		this.on(fn,callack)
-    	}
+    	} 
     })
 })
