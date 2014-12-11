@@ -89,5 +89,5 @@ define('touch','core',function(core,exports){
     		this.on(fn,callack)
     		return this
     	} 
-    })
+    }) 
 })
