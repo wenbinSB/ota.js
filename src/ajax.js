@@ -7,6 +7,7 @@ define('ajax',['util'],function(util,exports){
 	var rnoContent = /^(?:get|head)$/;
 	var ajax = function(config){
 		var type = config.type
+		var useFormData = config.useFormData
 		var needContentType = config.contentType && !rnoContent.test(type); //文件上传无需 content-type,自动设置
 		var data = config.data;
 		var crossdomain = getUrlHost(config.url) !== location.host;
@@ -22,7 +23,12 @@ define('ajax',['util'],function(util,exports){
 				data = null
 			}else{
 				// formData
-				data = makeFormData(data,traditional)
+				if(useFormData){
+					data = makeFormData(data,traditional)
+				}else{
+					// add Content-Type
+					data = encodeData(data,traditional)
+				}
 			}
 		}
 
@@ -53,7 +59,11 @@ define('ajax',['util'],function(util,exports){
 				delete config.headers['X-Requested-With'];
 			}
 			if(needContentType){
-				xhr.setRequestHeader('content-type',config.contentType)
+				// 大小写差异，不规范需要 allow-headers
+				xhr.setRequestHeader('Content-Type',config.contentType)
+			}
+			if(!useFormData){
+				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
 			}
 			if(config.headers){
 				util.each(config.headers,function(header,key){
@@ -121,7 +131,8 @@ define('ajax',['util'],function(util,exports){
 	        timeout: null,
 	        crossdomain: false,
 	        traditional: false,
-	        jsonp: 'callback'
+	        jsonp: 'callback',
+	        useFormData: true
 		}
 		config.type = config.type || defaultConfig.type.toLowerCase();
 		config = util.extend(config,defaultConfig,true)
@@ -137,7 +148,8 @@ define('ajax',['util'],function(util,exports){
 	        timeout: null,
 	        chunked: false, //分块上传 http://www.html5rocks.com/zh/tutorials/file/xhr2/
 	        crossdomain: false,
-	        _upload: true
+	        _upload: true,
+	        useFormData: true
 		}
 		config = util.extend(config,defaultConfig,true)
 		return ajax(config)

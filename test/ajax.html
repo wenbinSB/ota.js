@@ -3,6 +3,9 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
+	<style>
+	body {background: red;}
+	</style>
 </head>
 <body>
 	<input type="file" name="image" id="xx" multiple>
@@ -66,6 +69,34 @@
 		// 	// crossdomain: true,
 		// 	// traditional: true
 		// })
+		ajax({
+			url: 'http://127.0.0.1:9527/search',
+			type: 'post',
+			dataType: 'json',
+			data: {
+				s: 'lisa',
+				type: 100
+			},
+			useFormData: false,
+			success: function(d){
+				// ajax({
+				// 	url: 'http://127.0.0.1:9527/artist?artist=' + d.result.artists[0].id,
+				// 	success: function(d){
+				// 		console.log(d.artist)
+				// 	}
+				// })
+				ajax({
+					url: 'http://127.0.0.1:9527/search',
+					type: 'post',
+					dataType: 'json',
+					data: {
+						s: 'lisa',
+						type: 100
+					},
+					useFormData: false,
+				})
+			}
+		})
 	})
 </script>
 </html>

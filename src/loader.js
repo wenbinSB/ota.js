@@ -5,7 +5,6 @@
 		path: getCurPath(), //默认使用 loader 的目录
 		alias: {}
 	}
-	var loaded = []
 	var loader = function(conf){
 		for(var i in conf){
 			if(conf.hasOwnProperty(i)){
@@ -30,6 +29,10 @@
 	}
 	function define(mod,requires,callback){
 		var mods = modules,requireMods = []
+		if(mods[mod]){
+			// 加载过 todo
+			return
+		}
 		 if(typeof callback === 'undefined'){
 		 	callback = requires
 		 	requires = []
@@ -41,7 +44,8 @@
 		 	requires: requires,
 		 	exports: {},
 		 	loaded: false,
-		 	callback: callback
+		 	callback: callback,
+		 	callbackLoaded: false
 		 } 
 	}
 
@@ -61,10 +65,12 @@
 			new Depends(this.requires,function(dependList){
 				dependList.forEach(function(modName){
 					var module = mods[modName]
+					if(module.callbackLoaded) return
 					var requireMods = module.requires.map(function(mod){
 						return mods[mod].exports
 					})
 					module.callback.apply(null,requireMods.concat(module.exports))
+					module.callbackLoaded = true
 				})
 				var requireMods = self.requires.map(function(mod){
 					return mods[mod].exports
@@ -99,6 +105,7 @@
 		init: function(){
 			var mods = modules,
 				self = this
+				this.loaded = [],
 			this.getDepend(this.requires)
 		},
 		getDepend: function(requires){
@@ -107,13 +114,13 @@
 			this.waiting += requires.length
 			requires.forEach(function(require){
 				// console.log(require)
-				if(loaded[require]){
+				if(self.loaded[require]){
 					// console.log('xxxx')
 					self.waiting--
 					return self.checkDone()
 				}
 				// console.log(require)
-				loaded[require] = true
+				self.loaded[require] = true
 				new Mod(require,function(){
 					self.waiting--
 					mods[require].loaded = true
