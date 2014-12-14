@@ -30,7 +30,7 @@
 	function define(mod,requires,callback){
 		var mods = modules,requireMods = []
 		if(mods[mod]){
-			// 加载过 todo
+			// 防止并发问题，确保只定义一次 module
 			return
 		}
 		 if(typeof callback === 'undefined'){
@@ -45,7 +45,7 @@
 		 	exports: {},
 		 	loaded: false,
 		 	callback: callback,
-		 	callbackLoaded: false
+		 	// callbackLoaded: false
 		 } 
 	}
 
@@ -65,12 +65,12 @@
 			new Depends(this.requires,function(dependList){
 				dependList.forEach(function(modName){
 					var module = mods[modName]
-					if(module.callbackLoaded) return
+					if(module.loaded) return
 					var requireMods = module.requires.map(function(mod){
 						return mods[mod].exports
 					})
 					module.callback.apply(null,requireMods.concat(module.exports))
-					module.callbackLoaded = true
+					module.loaded = true
 				})
 				var requireMods = self.requires.map(function(mod){
 					return mods[mod].exports
@@ -103,9 +103,6 @@
 	}
 	Depends.prototype = {
 		init: function(){
-			var mods = modules,
-				self = this
-				this.loaded = [],
 			this.getDepend(this.requires)
 		},
 		getDepend: function(requires){
@@ -114,25 +111,24 @@
 			this.waiting += requires.length
 			requires.forEach(function(require){
 				// console.log(require)
-				if(self.loaded[require]){
-					// console.log('xxxx')
-					self.waiting--
-					return self.checkDone()
+				if(mods[require]){
+					return self.makeDependList(require)
+				}else{
+					return new Mod(require,function(){
+						return self.makeDependList(require)
+					})
 				}
-				// console.log(require)
-				self.loaded[require] = true
-				new Mod(require,function(){
-					self.waiting--
-					mods[require].loaded = true
-					// console.log(require)
-					if(mods[require]['requires'].length){
-						self.dependList[require] = mods[require]['requires']
-						// console.log(self.dependList)
-						return self.getDepend(mods[require]['requires'])
-					}
-					self.checkDone()
-				})
 			})
+		},
+		makeDependList: function(modName){
+			var mods = modules
+			this.waiting--
+			if(mods[modName].requires.length){
+				this.dependList[modName] = mods[modName].requires
+				return this.getDepend(mods[modName].requires)
+			}else{
+				return this.checkDone()
+			}
 		},
 		checkDone: function(){
 			if(!this.waiting){
