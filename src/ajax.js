@@ -4,14 +4,14 @@ define('ajax',['util'],function(util,exports){
 	// Promise.race 哪个先触发 reject 或者 resolve 触发then
 	// Promise.reject 将对象转变为 promise 对象
 	// Promise.resolve 将对象转变为 promise 对象
-	var rnoContent = /^(?:get|head)$/;
+	var rnoContent = /^(?:get|head)$/
 	var ajax = function(config){
 		var type = config.type
-		var useFormData = config.useFormData
-		var needContentType = config.contentType && !rnoContent.test(type); //文件上传无需 content-type,自动设置
-		var data = config.data;
-		var crossdomain = getUrlHost(config.url) !== location.host;
-		var dataType = config.dataType || '';
+		var useFormData = config.useFormData && util.isObject(config.data)
+		var needContentType = config.contentType && !rnoContent.test(type) //文件上传无需 content-type,自动设置
+		var data = config.data
+		var crossdomain = getUrlHost(config.url) !== location.host
+		var dataType = config.dataType || ''
 		var traditional = config.traditional
 		
 		if(data){
@@ -33,9 +33,9 @@ define('ajax',['util'],function(util,exports){
 		}
 
 		if(dataType.toLowerCase() === 'jsonp'){
-			var jsonpCallback = config.jsonpCallback;
+			var jsonpCallback = config.jsonpCallback
 			if(!jsonpCallback){
-				jsonpCallback = 'misakaCallback' + (config.fresh ? util.now() : '');
+				jsonpCallback = 'misakaCallback' + (config.fresh ? util.now() : '')
 			}
 			window[jsonpCallback] = window[jsonpCallback] || function(){
 				config.success && config.success.apply(null,[].slice.call(arguments))
@@ -51,12 +51,12 @@ define('ajax',['util'],function(util,exports){
 
 		var ajaxPromise = new Promise(function(resolve,reject){
 			var xhr = new XMLHttpRequest,upload
-			xhr.open(type,config.url,config.async);
+			xhr.open(type,config.url,config.async)
 			if(crossdomain){
 				if(config.crossdomain){
-					xhr.withCredentials = true;
+					xhr.withCredentials = true
 				}
-				delete config.headers['X-Requested-With'];
+				delete config.headers['X-Requested-With']
 			}
 			if(needContentType){
 				// 大小写差异，不规范需要 allow-headers
@@ -134,7 +134,7 @@ define('ajax',['util'],function(util,exports){
 	        jsonp: 'callback',
 	        useFormData: true
 		}
-		config.type = config.type || defaultConfig.type.toLowerCase();
+		config.type = config.type || defaultConfig.type.toLowerCase()
 		config = util.extend(config,defaultConfig,true)
 		return ajax(config)
 	}
@@ -161,33 +161,34 @@ define('ajax',['util'],function(util,exports){
 			onerror = null;
 		}
 		var s = document.createElement('script'),
-			head = document.getElementsByTagName('head')[0];
+			head = document.getElementsByTagName('head')[0]
 		s.async = true;
 		s.onload = function(){
-			head.removeChild(s);
-			onload && onload();
-			s = null;
+			head.removeChild(s)
+			onload && onload()
+			s = null
 		}
 		s.onerror = function(e){
-			head.removeChild(s);
-			onerror && onerror(e);
-			s = null;
+			head.removeChild(s)
+			onerror && onerror(e)
+			s = null
 		}
 		extra && util.each(extra,function(value,property){
-			s[property] = extra[property];
+			s[property] = extra[property]
 		})
-		s.src = url;
-		head.appendChild(s);
+		s.src = url
+		head.appendChild(s)
 	}
 
 	var getUrlHost = (function(){
 		var a = document.createElement('a')
 		return function(url){
-			a.href = url;
+			a.href = url
 			return a.host
 		}
 	})()
 	function encodeData(data,traditional){
+		if(util.isString(data)){return data.replace(/\+/g,'%2B')}
 		var ret = [];
 		util.each(data,function(d,key){
 			if(util.isArray(d) || util.isArrayLike(d)){
@@ -206,32 +207,34 @@ define('ajax',['util'],function(util,exports){
 	}
 	function makeFormData(data,traditional){
 		// formdata 无需编码属性名
+		// formdata 无需编码
 		var formData = new FormData
 		util.each(data,function(d,prop){
 			if(util.isArray(d) || util.isArrayLike(d)){
 				var _prop = traditional ? prop : prop + '[]'
 				util.each(d,function(_d){
-					if(util.isString(_d)){
-						_d = encodeURIComponent(_d)
-					}
+					// if(util.isString(_d)){
+					// 	_d = encodeURIComponent(_d)
+					// }
 					formData.append(_prop,_d)
 				})
 			}else{
-				formData.append(prop,encodeURIComponent(d))
+				formData.append(prop,(d))
 			}
 		})
 		return formData
 	}
 	function addQuery(url,data){
+		data = data.replace(/\+/g,'%2B')
 		if(url.indexOf('?') !== -1){
 			url += '&' + data
 		}else{
 			url += '?' + data
 		}
-		return url;
+		return url
 	}
-	exports.ajax = ajaxSetup;
-	exports.getScript = getScript;
+	exports.ajax = ajaxSetup
+	exports.getScript = getScript
 	exports.fileUpload = uploadSetup
 	console.log('ajax加载完毕')
 })
