@@ -75,7 +75,7 @@
 				var requireMods = self.requires.map(function(mod){
 					return mods[mod].exports
 				})
-				return self.callback.apply(null,requireMods)
+				return self.callback && self.callback.apply(null,requireMods)
 			})
 		}
 	}
