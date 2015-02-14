@@ -74,17 +74,25 @@ define('ajax',['util'],function(util,exports){
 				xhr.timeout = config.timeout
 			}
 			xhr.onload = function(){
-				resolve({
-					value: this.responseText,
-					dataType: dataType,
-					onloadCallback: config.success,
-					xhr: this
-				})
+				if(this.status >= 200 && this.status < 300 || this.status === 304){
+					resolve({
+						value: this.responseText,
+						dataType: dataType,
+						onloadCallback: config.success || function(){},
+						xhr: this
+					})
+				}else{
+					reject({
+						value: e,
+						errorCallback: config.error || function(){},
+						xhr: this
+					})
+				}
 			}
 			xhr.ontimeout = xhr.onerror = function(e){
 				reject({
 					value: e,
-					errorCallback: config.error,
+					errorCallback: config.error || function(){},
 					xhr: this
 				})
 			}

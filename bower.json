@@ -1,0 +1,29 @@
+{
+  "name": "ota.js",
+  "version": "1.0.0",
+  "homepage": "https://github.com/otarim/ota.js",
+  "authors": [
+    "otarim <otarim.com@gmail.com>"
+  ],
+  "description": "a lightweight javascript library",
+  "main": "./src/loader.js",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "ota.js",
+    "otarim"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "bak",
+    "dest",
+    "test",
+    "animate.css"
+  ]
+}

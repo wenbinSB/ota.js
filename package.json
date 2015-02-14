@@ -1,0 +1,26 @@
+{
+  "name": "ota.js",
+  "version": "1.0.0",
+  "description": "a light height javascript library",
+  "main": "src/loader.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/otarim/ota.js.git"
+  },
+  "keywords": [
+    "js",
+    "otarim"
+  ],
+  "author": "otarim",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/otarim/ota.js/issues"
+  },
+  "homepage": "https://github.com/otarim/ota.js"
+}

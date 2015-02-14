@@ -16,7 +16,7 @@ const api = {
 	song: '/api/song/detail', //id=a&ids=[a]
 }
 
-const post = '9527'
+const port = '9527'
 
 var extend = function(p,c){
 	var ret = p
@@ -113,7 +113,6 @@ http.createServer(function(req,res){
                 break
 			case 'song':
 				data = {id : query.id, ids: '[' + query.id + ']'}
-                console.log(data)
 				break
             case 'userList':
                 data = {offset: query.offset, limit: query.limit, uid: query.uid }
@@ -188,5 +187,5 @@ http.createServer(function(req,res){
         })
         res.end()
     }
-}).listen(post)
+}).listen(port)
 
